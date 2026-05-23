@@ -118,11 +118,7 @@ CREATE TABLE tasks (
 
 ---
 
-## 📸 Screenshots
 
-*[Add screenshots here after running the project]*
-
----
 
 ## 🎯 Evaluation Coverage
 
