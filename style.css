@@ -1,0 +1,223 @@
+/* ============================================================
+   SMART TASK MANAGER — STYLESHEET
+   Candidate: Goudampally Sai Snehitha
+   ============================================================ */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f0f4f8;
+  color: #333;
+}
+
+/* NAVBAR */
+.navbar {
+  background: #1a3a5c;
+  padding: 14px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.nav-brand { color: white; font-size: 20px; font-weight: 700; }
+.nav-right  { display: flex; align-items: center; gap: 16px; color: white; font-size: 14px; }
+.btn-logout {
+  background: #c92a2a; color: white; padding: 8px 16px;
+  border-radius: 6px; text-decoration: none; font-size: 13px;
+  transition: background 0.2s;
+}
+.btn-logout:hover { background: #a61e1e; }
+
+/* CONTAINER */
+.container { max-width: 1000px; margin: 28px auto; padding: 0 20px; }
+
+/* ANALYTICS GRID */
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.analytics-card {
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.analytics-card.blue   { background: #1971c2; }
+.analytics-card.green  { background: #2f9e44; }
+.analytics-card.orange { background: #e67700; }
+.analytics-card.teal   { background: #0b7285; }
+.analytics-number { font-size: 36px; font-weight: 700; }
+.analytics-label  { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+
+/* CARD */
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.card h2 { font-size: 18px; color: #1a3a5c; margin-bottom: 16px; }
+
+/* FORM */
+.form-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+input, select, textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid #dee2e6;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #f8fafb;
+  transition: border-color 0.2s;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #1a3a5c;
+  background: white;
+}
+textarea { min-height: 80px; resize: vertical; margin-bottom: 12px; }
+
+/* BUTTONS */
+.btn-primary {
+  background: #1a3a5c;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-primary:hover { background: #0f2540; }
+
+/* TASK HEADER */
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.filter-group { display: flex; gap: 10px; }
+.filter-group select { width: auto; padding: 8px 12px; }
+
+/* TASK CARDS */
+.task-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  border-left: 4px solid #dee2e6;
+  background: #f8fafb;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.task-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.task-card.priority-high   { border-left-color: #c92a2a; }
+.task-card.priority-medium { border-left-color: #e67700; }
+.task-card.priority-low    { border-left-color: #2f9e44; }
+
+.task-title { font-size: 15px; font-weight: 600; color: #1a3a5c; margin-bottom: 4px; }
+.task-desc  { font-size: 13px; color: #666; margin-bottom: 8px; }
+.task-meta  { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.task-date  { font-size: 12px; color: #888; }
+
+/* BADGES */
+.badge { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+.priority-badge-high   { background: #fff5f5; color: #c92a2a; }
+.priority-badge-medium { background: #fff4e6; color: #e67700; }
+.priority-badge-low    { background: #ebfbee; color: #2f9e44; }
+.status-badge-pending     { background: #e7f5ff; color: #1971c2; }
+.status-badge-in-progress { background: #fff4e6; color: #e67700; }
+.status-badge-completed   { background: #ebfbee; color: #2f9e44; }
+
+/* TASK ACTIONS */
+.task-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.btn-edit   { background: #e7f5ff; color: #1971c2; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+.btn-delete { background: #fff5f5; color: #c92a2a; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+.btn-edit:hover   { background: #d0ebff; }
+.btn-delete:hover { background: #ffc9c9; }
+
+/* EMPTY MESSAGE */
+.empty-msg { text-align: center; color: #888; padding: 32px; font-size: 15px; }
+
+/* NOTIFICATION */
+.notification {
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.notification.success { background: #ebfbee; color: #2f9e44; border: 1px solid #b2f2bb; }
+.notification.info    { background: #e7f5ff; color: #1971c2; border: 1px solid #a5d8ff; }
+.notification.warning { background: #fff4e6; color: #e67700; border: 1px solid #ffd8a8; }
+
+/* MODAL */
+.modal {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+}
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 28px;
+  width: 90%;
+  max-width: 500px;
+}
+.modal-content h3 { margin-bottom: 16px; color: #1a3a5c; }
+.modal-content input,
+.modal-content select,
+.modal-content textarea { margin-bottom: 12px; }
+.modal-btns { display: flex; gap: 12px; margin-top: 8px; }
+.btn-cancel {
+  background: #f1f3f5; color: #555; border: none;
+  padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px;
+}
+
+/* AUTH PAGES */
+.auth-body { background: linear-gradient(135deg, #1a3a5c, #0b7285); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+.auth-container { width: 100%; max-width: 420px; padding: 20px; }
+.auth-card {
+  background: white; border-radius: 16px;
+  padding: 40px 36px; box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+.auth-logo    { font-size: 48px; text-align: center; margin-bottom: 8px; }
+.auth-title   { font-size: 24px; font-weight: 700; text-align: center; color: #1a3a5c; margin-bottom: 4px; }
+.auth-subtitle { font-size: 14px; text-align: center; color: #888; margin-bottom: 24px; }
+.form-group   { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px; }
+.btn-auth {
+  width: 100%; background: #1a3a5c; color: white;
+  border: none; padding: 12px; border-radius: 8px;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+  margin-top: 8px; transition: background 0.2s;
+}
+.btn-auth:hover { background: #0f2540; }
+.auth-switch  { text-align: center; margin-top: 20px; font-size: 14px; color: #666; }
+.auth-switch a { color: #0b7285; font-weight: 600; text-decoration: none; }
+.alert-error  { background: #fff5f5; color: #c92a2a; border: 1px solid #ffc9c9; padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; }
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .analytics-grid { grid-template-columns: repeat(2, 1fr); }
+  .form-grid { grid-template-columns: 1fr; }
+  .task-header { flex-direction: column; align-items: flex-start; }
+  .filter-group { flex-direction: column; width: 100%; }
+}

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Task Manager</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-brand">📋 Smart Task Manager</div>
+  <div class="nav-right">
+    <span>👤 {{ username }}</span>
+    <a href="/logout" class="btn-logout">Logout</a>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="container">
+
+  <!-- ANALYTICS SECTION -->
+  <div class="analytics-grid" id="analyticsGrid">
+    <div class="analytics-card blue">
+      <div class="analytics-number" id="totalTasks">0</div>
+      <div class="analytics-label">Total Tasks</div>
+    </div>
+    <div class="analytics-card green">
+      <div class="analytics-number" id="completedTasks">0</div>
+      <div class="analytics-label">Completed</div>
+    </div>
+    <div class="analytics-card orange">
+      <div class="analytics-number" id="pendingTasks">0</div>
+      <div class="analytics-label">Pending</div>
+    </div>
+    <div class="analytics-card teal">
+      <div class="analytics-number" id="completionPct">0%</div>
+      <div class="analytics-label">Completion %</div>
+    </div>
+  </div>
+
+  <!-- ADD TASK FORM -->
+  <div class="card">
+    <h2>➕ Add New Task</h2>
+    <div class="form-grid">
+      <input type="text" id="taskTitle" placeholder="Task Title *" required>
+      <select id="taskPriority">
+        <option value="High">🔴 High Priority</option>
+        <option value="Medium" selected>🟡 Medium Priority</option>
+        <option value="Low">🟢 Low Priority</option>
+      </select>
+    </div>
+    <textarea id="taskDesc" placeholder="Task Description (optional)"></textarea>
+    <button class="btn-primary" onclick="addTask()">➕ Add Task</button>
+  </div>
+
+  <!-- NOTIFICATION -->
+  <div id="notification" class="notification" style="display:none;"></div>
+
+  <!-- TASK LIST -->
+  <div class="card">
+    <div class="task-header">
+      <h2>📝 My Tasks</h2>
+      <div class="filter-group">
+        <select id="filterStatus" onchange="filterTasks()">
+          <option value="all">All Tasks</option>
+          <option value="Pending">Pending</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+        </select>
+        <select id="filterPriority" onchange="filterTasks()">
+          <option value="all">All Priorities</option>
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low">Low</option>
+        </select>
+      </div>
+    </div>
+    <div id="taskList">
+      <p class="empty-msg">Loading tasks...</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- EDIT MODAL -->
+<div id="editModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <h3>✏️ Edit Task</h3>
+    <input type="hidden" id="editTaskId">
+    <input type="text" id="editTitle" placeholder="Title">
+    <textarea id="editDesc" placeholder="Description"></textarea>
+    <select id="editPriority">
+      <option value="High">🔴 High</option>
+      <option value="Medium">🟡 Medium</option>
+      <option value="Low">🟢 Low</option>
+    </select>
+    <select id="editStatus">
+      <option value="Pending">Pending</option>
+      <option value="In Progress">In Progress</option>
+      <option value="Completed">Completed</option>
+    </select>
+    <div class="modal-btns">
+      <button class="btn-primary" onclick="saveEdit()">💾 Save</button>
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // WebSocket connection
+  const socket = io();
+  let allTasks = [];
+
+  socket.on('connected', (data) => {
+    console.log(data.message);
+  });
+
+  socket.on('task_added', (task) => {
+    showNotification('🔔 New task added: ' + task.title, 'success');
+    loadTasks();
+  });
+
+  socket.on('task_updated', (task) => {
+    showNotification('✅ Task updated: ' + task.title, 'info');
+    loadTasks();
+  });
+
+  socket.on('task_deleted', (data) => {
+    showNotification('🗑️ Task deleted!', 'warning');
+    loadTasks();
+  });
+
+  // Load tasks on page load
+  window.onload = () => {
+    loadTasks();
+    loadAnalytics();
+  };
+
+  async function loadTasks() {
+    const res   = await fetch('/api/tasks');
+    allTasks    = await res.json();
+    filterTasks();
+  }
+
+  function filterTasks() {
+    const status   = document.getElementById('filterStatus').value;
+    const priority = document.getElementById('filterPriority').value;
+
+    let filtered = allTasks;
+    if (status   !== 'all') filtered = filtered.filter(t => t.status   === status);
+    if (priority !== 'all') filtered = filtered.filter(t => t.priority === priority);
+
+    renderTasks(filtered);
+  }
+
+  function renderTasks(tasks) {
+    const list = document.getElementById('taskList');
+    if (!tasks.length) {
+      list.innerHTML = '<p class="empty-msg">No tasks found! Add your first task above 🚀</p>';
+      return;
+    }
+
+    list.innerHTML = tasks.map(task => `
+      <div class="task-card priority-${task.priority.toLowerCase()}">
+        <div class="task-left">
+          <div class="task-title">${task.title}</div>
+          <div class="task-desc">${task.description || 'No description'}</div>
+          <div class="task-meta">
+            <span class="badge priority-badge-${task.priority.toLowerCase()}">${task.priority}</span>
+            <span class="badge status-badge-${task.status.replace(' ','-').toLowerCase()}">${task.status}</span>
+            <span class="task-date">📅 ${task.created_at.split('T')[0]}</span>
+          </div>
+        </div>
+        <div class="task-actions">
+          <button class="btn-edit" onclick="openEdit(${task.id}, '${task.title}', '${task.description || ''}', '${task.priority}', '${task.status}')">✏️</button>
+          <button class="btn-delete" onclick="deleteTask(${task.id})">🗑️</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function addTask() {
+    const title    = document.getElementById('taskTitle').value.trim();
+    const desc     = document.getElementById('taskDesc').value.trim();
+    const priority = document.getElementById('taskPriority').value;
+
+    if (!title) { showNotification('⚠️ Title is required!', 'warning'); return; }
+
+    await fetch('/api/tasks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, description: desc, priority })
+    });
+
+    document.getElementById('taskTitle').value = '';
+    document.getElementById('taskDesc').value  = '';
+    loadAnalytics();
+  }
+
+  async function deleteTask(id) {
+    if (!confirm('Delete this task?')) return;
+    await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
+    loadAnalytics();
+  }
+
+  function openEdit(id, title, desc, priority, status) {
+    document.getElementById('editTaskId').value  = id;
+    document.getElementById('editTitle').value   = title;
+    document.getElementById('editDesc').value    = desc;
+    document.getElementById('editPriority').value = priority;
+    document.getElementById('editStatus').value  = status;
+    document.getElementById('editModal').style.display = 'flex';
+  }
+
+  async function saveEdit() {
+    const id   = document.getElementById('editTaskId').value;
+    const data = {
+      title:       document.getElementById('editTitle').value,
+      description: document.getElementById('editDesc').value,
+      priority:    document.getElementById('editPriority').value,
+      status:      document.getElementById('editStatus').value
+    };
+
+    await fetch(`/api/tasks/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    closeModal();
+    loadAnalytics();
+  }
+
+  function closeModal() {
+    document.getElementById('editModal').style.display = 'none';
+  }
+
+  async function loadAnalytics() {
+    const res  = await fetch('/api/analytics');
+    const data = await res.json();
+    document.getElementById('totalTasks').textContent     = data.total_tasks || 0;
+    document.getElementById('completedTasks').textContent = data.completed_tasks || 0;
+    document.getElementById('pendingTasks').textContent   = data.pending_tasks || 0;
+    document.getElementById('completionPct').textContent  = (data.completion_percentage || 0) + '%';
+  }
+
+  function showNotification(msg, type) {
+    const n = document.getElementById('notification');
+    n.textContent  = msg;
+    n.className    = `notification ${type}`;
+    n.style.display = 'block';
+    setTimeout(() => { n.style.display = 'none'; }, 3000);
+  }
+</script>
+</body>
+</html>
